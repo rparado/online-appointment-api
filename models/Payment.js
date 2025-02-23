@@ -1,6 +1,6 @@
 import { DataTypes } from 'sequelize';
-import sequelize from '../config/database.js';
-import Appointment from './Appointment.js';
+import sequelize from '../config/db.js';
+import Appointment from './Appointments.js';
 import Patient from './Patient.js';
 import Doctor from './Doctor.js';
 
