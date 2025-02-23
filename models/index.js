@@ -1,41 +1,48 @@
-import sequelize from "../config/database.js";
-import { DataTypes } from "sequelize";
-import bcrypt from "bcrypt";
+import sequelize from '../config/database.js';
+import User from './User.js';
+import Patient from './Patient.js';
+import Doctor from './Doctor.js';
+import Secretary from './Secretary.js';
+import Appointment from './Appointment.js';
+import DoctorAvailability from './DoctorAvailability.js';
+import Payment from './Payment.js';
+import MedicalRecord from './MedicalRecord.js';
 
-const User = sequelize.define("User", {
-  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  password: { type: DataTypes.STRING, allowNull: false },
-  phone_number: { type: DataTypes.STRING, unique: true, allowNull: false },
-  email_address: { type: DataTypes.STRING, unique: true, allowNull: false },
-  role: { type: DataTypes.STRING, defaultValue: "patient", allowNull: false },
-}, 
-    { 
-        timestamps: true,
-        hooks: {
-            beforeCreate: async (user) => {
-              if (user.password) {
-                user.password = await bcrypt.hash(user.password, 10);
-              }
-            },
-          },
-    }
-);
+// Define model relationships
+User.hasOne(Patient, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+Patient.belongsTo(User, { foreignKey: 'user_id' });
 
-const Patient = sequelize.define("Patient", {
-  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  user_id: { type: DataTypes.INTEGER, unique: true, allowNull: false },
-  first_name: { type: DataTypes.STRING, allowNull: false },
-  last_name: { type: DataTypes.STRING, allowNull: false },
-  date_of_birth: { type: DataTypes.DATE, allowNull: false },
-  gender: { type: DataTypes.STRING, allowNull: false },
-  address: { type: DataTypes.TEXT },
-  medical_history: { type: DataTypes.TEXT },
-  //created_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
-  //updated_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
+User.hasOne(Doctor, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+Doctor.belongsTo(User, { foreignKey: 'user_id' });
+
+User.hasOne(Secretary, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+Secretary.belongsTo(User, { foreignKey: 'user_id' });
+
+Patient.hasMany(Appointment, { foreignKey: 'patient_id', onDelete: 'CASCADE' });
+Doctor.hasMany(Appointment, { foreignKey: 'doctor_id', onDelete: 'CASCADE' });
+Appointment.belongsTo(Patient, { foreignKey: 'patient_id' });
+Appointment.belongsTo(Doctor, { foreignKey: 'doctor_id' });
+
+Doctor.hasMany(DoctorAvailability, { foreignKey: 'doctor_id', onDelete: 'CASCADE' });
+DoctorAvailability.belongsTo(Doctor, { foreignKey: 'doctor_id' });
+
+Patient.hasMany(Payment, { foreignKey: 'patient_id', onDelete: 'CASCADE' });
+Doctor.hasMany(Payment, { foreignKey: 'doctor_id', onDelete: 'CASCADE' });
+Appointment.hasOne(Payment, { foreignKey: 'appointment_id', onDelete: 'CASCADE' });
+Payment.belongsTo(Patient, { foreignKey: 'patient_id' });
+Payment.belongsTo(Doctor, { foreignKey: 'doctor_id' });
+Payment.belongsTo(Appointment, { foreignKey: 'appointment_id' });
+
+Patient.hasMany(MedicalRecord, { foreignKey: 'patient_id', onDelete: 'CASCADE' });
+Doctor.hasMany(MedicalRecord, { foreignKey: 'doctor_id', onDelete: 'CASCADE' });
+Appointment.hasOne(MedicalRecord, { foreignKey: 'appointment_id', onDelete: 'CASCADE' });
+MedicalRecord.belongsTo(Patient, { foreignKey: 'patient_id' });
+MedicalRecord.belongsTo(Doctor, { foreignKey: 'doctor_id' });
+MedicalRecord.belongsTo(Appointment, { foreignKey: 'appointment_id' });
+
+// Sync database (optional)
+sequelize.sync({ alter: true }).then(() => {
+  console.log('Database synchronized');
 });
 
-// Relationships
-User.hasOne(Patient, { foreignKey: "user_id", onDelete: "CASCADE" });
-Patient.belongsTo(User, { foreignKey: "user_id" });
-
-export { sequelize, User, Patient };
+export { sequelize, User, Patient, Doctor, Secretary, Appointment, DoctorAvailability, Payment, MedicalRecord };
