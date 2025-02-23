@@ -2,7 +2,13 @@ import AdminJS from 'adminjs';
 import AdminJSExpress from '@adminjs/express';
 import { Database, Resource } from '@adminjs/sequelize';
 import { Sequelize } from 'sequelize';
-import { User, Patient, Doctor, Secretary, Appointment, MedicalRecord, Payment } from '../models/index.js';
+import bcrypt from 'bcrypt';
+import session from 'express-session';
+import dotenv from 'dotenv';
+import { User, Patient, Doctor, Secretary, Appointment, MedicalRecord, Payment, DoctorAvailability } from '../models/index.js';
+
+dotenv.config();
+
 AdminJS.registerAdapter({ Database, Resource });
 
 // Define Sequelize connection
@@ -18,102 +24,70 @@ const adminJs = new AdminJS({
   resources: [
     {
       resource: User,
-      options: {
-        parent: {
-          name: 'Users Management',
-          icon: 'User',
-        },
-        listProperties: ['id', 'email', 'role', 'createdAt'],
-        editProperties: ['email', 'password', 'role'],
-        showProperties: ['id', 'email', 'role', 'createdAt', 'updatedAt'],
-      },
+      options: { navigation: { name: 'Users', icon: 'User' } },
     },
     {
       resource: Patient,
-      options: {
-        parent: {
-          name: 'Patient Management',
-          icon: 'Heartbeat',
-        },
-        listProperties: ['id', 'first_name', 'last_name', 'date_of_birth', 'gender'],
-        editProperties: ['first_name', 'last_name', 'date_of_birth', 'gender', 'address', 'medical_history'],
-        showProperties: ['id', 'first_name', 'last_name', 'date_of_birth', 'gender', 'address', 'medical_history'],
-      },
+      options: { navigation: { name: 'Patients', icon: 'User' } },
     },
     {
       resource: Doctor,
-      options: {
-        parent: {
-          name: 'Doctor Management',
-          icon: 'Stethoscope',
-        },
-        listProperties: ['id', 'first_name', 'last_name', 'specialization', 'medical_license'],
-        editProperties: ['first_name', 'last_name', 'specialization', 'medical_license'],
-        showProperties: ['id', 'first_name', 'last_name', 'specialization', 'medical_license'],
-      },
+      options: { navigation: { name: 'Doctors', icon: 'Stethoscope' } },
     },
     {
       resource: Secretary,
-      options: {
-        parent: {
-          name: 'Staff Management',
-          icon: 'Briefcase',
-        },
-        listProperties: ['id', 'first_name', 'last_name', 'gender'],
-        editProperties: ['first_name', 'last_name', 'gender'],
-        showProperties: ['id', 'first_name', 'last_name', 'gender'],
-      },
+      options: { navigation: { name: 'Secretaries', icon: 'Assistant' } },
     },
     {
       resource: Appointment,
-      options: {
-        parent: {
-          name: 'Appointments',
-          icon: 'Calendar',
-        },
-        listProperties: ['id', 'patient_id', 'doctor_id', 'appointment_date', 'appointment_time', 'status'],
-        editProperties: ['patient_id', 'doctor_id', 'appointment_date', 'appointment_time', 'status', 'reason'],
-        showProperties: ['id', 'patient_id', 'doctor_id', 'appointment_date', 'appointment_time', 'status', 'reason'],
-      },
+      options: { navigation: { name: 'Appointments', icon: 'Calendar' } },
     },
     {
-      resource: MedicalRecord,
-      options: {
-        parent: {
-          name: 'Medical Records',
-          icon: 'FileMedical',
-        },
-        listProperties: ['id', 'patient_id', 'doctor_id', 'diagnosis', 'prescription'],
-        editProperties: ['patient_id', 'doctor_id', 'diagnosis', 'prescription', 'prescription_file'],
-        showProperties: ['id', 'patient_id', 'doctor_id', 'diagnosis', 'prescription', 'prescription_file'],
-      },
+      resource: DoctorAvailability,
+      options: { navigation: { name: 'Doctor Availability', icon: 'Clock' } },
     },
     {
       resource: Payment,
-      options: {
-        parent: {
-          name: 'Payments',
-          icon: 'DollarSign',
-        },
-        listProperties: ['id', 'appointment_id', 'patient_id', 'doctor_id', 'amount', 'status', 'payment_method'],
-        editProperties: ['appointment_id', 'patient_id', 'doctor_id', 'amount', 'status', 'payment_method'],
-        showProperties: ['id', 'appointment_id', 'patient_id', 'doctor_id', 'amount', 'status', 'payment_method', 'transaction_id'],
-      },
+      options: { navigation: { name: 'Payments', icon: 'Money' } },
+    },
+    {
+      resource: MedicalRecord,
+      options: { navigation: { name: 'Medical Records', icon: 'File' } },
     },
   ],
   branding: {
-    companyName: 'Healthcare Admin',
-    logo: 'https://your-logo-url.com/logo.png',
-    theme: {
-      colors: {
-        primary100: '#1976D2',
-        accent: '#FFC107',
-      },
-    },
+    companyName: 'Admin',
+    // logo: '/logo.png',
+    // theme: {
+    //   colors: {
+    //     primary100: '#D4E157',
+    //     primary80: '#CDDC39',
+    //     primary60: '#C0CA33',
+    //     primary40: '#AFB42B',
+    //     primary20: '#9E9D24',
+    //   },
+    // },
   },
 });
 
-const adminRouter = AdminJSExpress.buildRouter(adminJs);
+// AdminJS authentication
+const adminRouter = AdminJSExpress.buildAuthenticatedRouter(adminJs, {
+  authenticate: async (email, password) => {
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+
+    if (email === adminEmail && bcrypt.compareSync(password, adminPassword)) {
+      return { email };
+    }
+    return null;
+  },
+  cookiePassword: process.env.SESSION_SECRET || 'supersecret',
+}, null, {
+  resave: false,
+  saveUninitialized: true,
+  secret: process.env.SESSION_SECRET || 'supersecret',
+  cookie: { secure: false }, // Set `true` if using HTTPS
+});
 
 export default (app) => {
   app.use(adminJs.options.rootPath, adminRouter);
