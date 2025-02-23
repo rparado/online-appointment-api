@@ -40,7 +40,6 @@ MedicalRecord.belongsTo(Patient, { foreignKey: 'patient_id' });
 MedicalRecord.belongsTo(Doctor, { foreignKey: 'doctor_id' });
 MedicalRecord.belongsTo(Appointment, { foreignKey: 'appointment_id' });
 
-// Sync database (optional)
 sequelize.sync({ alter: true }).then(() => {
   console.log('Database synchronized');
 });
