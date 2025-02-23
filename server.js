@@ -1,31 +1,30 @@
-import "dotenv/config";
-import express from "express";
-import cors from "cors";
-import session from "express-session";
-import { Sequelize } from "sequelize";
-import sequelize from "./config/database.js"; // Import sequelize instance
-import authRoutes from "./routes/auth.js"; // Import routes
-import { admin, adminRouter } from "./admin/admin.js"; // Import AdminJS setup
+import express from 'express';
+import cors from 'cors';
+import bodyParser from 'body-parser';
+import dotenv from 'dotenv';
+import authRoutes from './routes/auth.js';
+import userRoutes from './routes/users.js';
+import appointmentRoutes from './routes/appointments.js';
+import paymentRoutes from './routes/payments.js';
+import recordRoutes from './routes/medicalRecords.js';
+import { authenticateToken } from './middlewares/authMiddleware.js';
+import adminJs from './admin/admin.js';
 
-
-
+dotenv.config();
 const app = express();
 
-// Middleware
-app.use(express.json());
 app.use(cors());
+app.use(bodyParser.json());
 
-// AdminJS setup
-app.use(admin.options.rootPath, adminRouter);
+// AdminJS
+adminJs(app);
 
 // Routes
-app.use("/api/auth", authRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/users', authenticateToken, userRoutes);
+app.use('/api/appointments', authenticateToken, appointmentRoutes);
+app.use('/api/payments', authenticateToken, paymentRoutes);
+app.use('/api/records', authenticateToken, recordRoutes);
 
-// Start the server
 const PORT = process.env.PORT || 5000;
-sequelize.sync().then(() => {
-  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-})
-.catch((err) => {
-  console.error("Database connection error:", err);
-});
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
