@@ -16,10 +16,10 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  role: {
+  role: { 
     type: DataTypes.STRING,
-    allowNull: false,
-    defaultValue: 'patient',
+    allowNull: false, 
+    defaultValue: 'patient' 
   },
   token: {
     type: DataTypes.STRING(500),
