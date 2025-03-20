@@ -10,6 +10,8 @@ import { User, Patient, Doctor, Secretary, Appointment, MedicalRecord, Payment, 
 import doctorResource from '../admin/resource/doctorResource.js';
 import specializationResource from '../admin/resource/specializationResource.js';
 import userResource from '../admin/resource/userResource.js';
+import appointmentResource from '../admin/resource/appointmentResource.js';
+
 
 dotenv.config();
 
@@ -70,23 +72,7 @@ const adminJsOptions = {
 				}
 			}
 		},
-		{
-			resource: Appointment,
-			options: {
-				navigation: { name: 'Appointments', icon: 'Calendar' },
-				actions: {
-					list: {
-						isAccessible: ({ currentAdmin }) => currentAdmin && (currentAdmin.role === 'doctor' || currentAdmin.role === 'admin'),
-						before: async (request, { currentAdmin }) => {
-							if (currentAdmin?.role === 'doctor') {
-								request.query = { ...request.query, where: { doctor_id: currentAdmin.id } };
-							}
-							return request;
-						}
-					}
-				}
-			}
-		},
+		appointmentResource,
 		{
 			resource: DoctorAvailability,
 			options: {
