@@ -12,6 +12,8 @@ import specializationResource from '../admin/resource/specializationResource.js'
 import userResource from '../admin/resource/userResource.js';
 import appointmentResource from '../admin/resource/appointmentResource.js';
 import medicalRecordResource from '../admin/resource/medicalRecordsResource.js';
+import patientResource from '../admin/resource/patientResource.js';
+
 
 dotenv.config();
 
@@ -36,23 +38,7 @@ const adminJsOptions = {
 	rootPath: '/admin',
 	resources: [
 		userResource,
-		{
-			resource: Patient,
-			options: {
-				navigation: { name: 'Patients', icon: 'User' },
-				actions: {
-					list: {
-						isAccessible: ({ currentAdmin }) => currentAdmin && (currentAdmin.role === 'doctor' || currentAdmin.role === 'admin'),
-						before: async (request, { currentAdmin }) => {
-							if (currentAdmin?.role === 'doctor') {
-								request.query = { ...request.query, where: { doctor_id: currentAdmin.id } };
-							}
-							return request;
-						}
-					}
-				}
-			}
-		},
+		patientResource,
 		doctorResource,
 		specializationResource,
 		{
