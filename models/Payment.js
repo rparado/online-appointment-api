@@ -1,68 +1,21 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/db.js';
-import Appointment from './Appointments.js';
 import Patient from './Patient.js';
 import Doctor from './Doctor.js';
+import Appointment from './Appointments.js';
 
 const Payment = sequelize.define('Payment', {
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-  },
-  appointment_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: Appointment,
-      key: 'id',
-    },
-  },
-  patient_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: Patient,
-      key: 'id',
-    },
-  },
-  doctor_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: Doctor,
-      key: 'id',
-    },
-  },
-  amount: {
-    type: DataTypes.FLOAT,
-    allowNull: false,
-  },
-  payment_method: {
-    type: DataTypes.ENUM('cash', 'credit_card', 'insurance', 'paypal'),
-    allowNull: false,
-  },
-  status: {
-    type: DataTypes.ENUM('pending', 'completed', 'failed'),
-    defaultValue: 'pending',
-  },
-  transaction_id: {
-    type: DataTypes.STRING,
-    allowNull: true, // Only needed for online payments
-  },
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  patient_id: { type: DataTypes.INTEGER, allowNull: false },
+  doctor_id: { type: DataTypes.INTEGER, allowNull: false },
+  appointment_id: { type: DataTypes.INTEGER, allowNull: false },
+  amount: { type: DataTypes.DECIMAL(10,2), allowNull: false },
+  status: { type: DataTypes.STRING(50), defaultValue: 'pending' },
+  payment_method: { type: DataTypes.STRING(50), allowNull: false },
+  transaction_id: { type: DataTypes.STRING(255), unique: true, allowNull: true },
 }, {
   timestamps: true,
   underscored: true,
 });
-
-// Relationships
-Appointment.hasOne(Payment, { foreignKey: 'appointment_id', onDelete: 'CASCADE' });
-Payment.belongsTo(Appointment, { foreignKey: 'appointment_id' });
-
-Patient.hasMany(Payment, { foreignKey: 'patient_id', onDelete: 'CASCADE' });
-Payment.belongsTo(Patient, { foreignKey: 'patient_id' });
-
-Doctor.hasMany(Payment, { foreignKey: 'doctor_id', onDelete: 'CASCADE' });
-Payment.belongsTo(Doctor, { foreignKey: 'doctor_id' });
 
 export default Payment;

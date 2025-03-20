@@ -11,7 +11,7 @@ const DoctorAvailability = sequelize.define('DoctorAvailability', {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: 'Doctors', // Ensure this matches your Doctor model table name
+      model: 'Doctors',
       key: 'id',
     },
     onDelete: 'CASCADE',

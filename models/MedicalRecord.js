@@ -1,8 +1,7 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/db.js';
-import Patient from './Patient.js';
+import User from './User.js';
 import Doctor from './Doctor.js';
-import Appointment from './Appointments.js';
 
 const MedicalRecord = sequelize.define('MedicalRecord', {
   id: {
@@ -14,7 +13,7 @@ const MedicalRecord = sequelize.define('MedicalRecord', {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: Patient,
+      model: User,
       key: 'id',
     },
   },
@@ -26,31 +25,31 @@ const MedicalRecord = sequelize.define('MedicalRecord', {
       key: 'id',
     },
   },
-  appointment_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: Appointment,
-      key: 'id',
-    },
-  },
   diagnosis: {
     type: DataTypes.TEXT,
     allowNull: false,
   },
+  treatment: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
   prescription: {
     type: DataTypes.TEXT,
+    allowNull: true,
   },
+  visit_date: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+  }
 }, {
   timestamps: true,
   underscored: true,
 });
 
-Patient.hasMany(MedicalRecord, { foreignKey: 'patient_id', onDelete: 'CASCADE' });
+User.hasMany(MedicalRecord, { foreignKey: 'patient_id', onDelete: 'CASCADE' });
+MedicalRecord.belongsTo(User, { foreignKey: 'patient_id' });
+
 Doctor.hasMany(MedicalRecord, { foreignKey: 'doctor_id', onDelete: 'CASCADE' });
-Appointment.hasOne(MedicalRecord, { foreignKey: 'appointment_id', onDelete: 'CASCADE' });
-MedicalRecord.belongsTo(Patient, { foreignKey: 'patient_id' });
 MedicalRecord.belongsTo(Doctor, { foreignKey: 'doctor_id' });
-MedicalRecord.belongsTo(Appointment, { foreignKey: 'appointment_id' });
 
 export default MedicalRecord;
