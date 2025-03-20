@@ -30,7 +30,7 @@ const Doctor = sequelize.define('Doctor', {
 		},
 		onDelete: 'SET NULL',
 	  },
-	medical_license: { type: DataTypes.STRING(50), unique: true, allowNull: false },
+	medical_license: { type: DataTypes.STRING(50), allowNull: false },
 	consultation_fee: {
 		type: DataTypes.DECIMAL(10, 2),
 		allowNull: false,
