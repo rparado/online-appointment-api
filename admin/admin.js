@@ -14,6 +14,8 @@ import appointmentResource from '../admin/resource/appointmentResource.js';
 import medicalRecordResource from '../admin/resource/medicalRecordsResource.js';
 import patientResource from '../admin/resource/patientResource.js';
 import secretaryResource from '../admin/resource/secretaryResource.js';
+import doctorAvailabilityResource from '../admin/resource/doctorAvailabilityResource.js';
+
 
 dotenv.config();
 
@@ -43,15 +45,7 @@ const adminJsOptions = {
 		specializationResource,
 		secretaryResource,
 		appointmentResource,
-		{
-			resource: DoctorAvailability,
-			options: {
-				navigation: { name: 'Doctor Availability', icon: 'Clock' },
-				actions: {
-					list: { isAccessible: ({ currentAdmin }) => (currentAdmin?.role === 'doctor' || currentAdmin.role === 'admin') }
-				}
-			}
-		},
+		doctorAvailabilityResource,
 		medicalRecordResource
 	],
 	branding: {
