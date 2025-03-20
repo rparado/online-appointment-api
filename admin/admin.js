@@ -11,7 +11,7 @@ import doctorResource from '../admin/resource/doctorResource.js';
 import specializationResource from '../admin/resource/specializationResource.js';
 import userResource from '../admin/resource/userResource.js';
 import appointmentResource from '../admin/resource/appointmentResource.js';
-
+import medicalRecordResource from '../admin/resource/medicalRecordsResource.js';
 
 dotenv.config();
 
@@ -82,23 +82,7 @@ const adminJsOptions = {
 				}
 			}
 		},
-		{
-			resource: MedicalRecord,
-			options: {
-				navigation: { name: 'Medical Records', icon: 'File' },
-				actions: {
-					list: {
-						isAccessible: ({ currentAdmin }) => (currentAdmin?.role === 'doctor' || currentAdmin.role === 'admin'),
-						before: async (request, { currentAdmin }) => {
-							if (currentAdmin?.role === 'doctor') {
-								request.query = { ...request.query, where: { doctor_id: currentAdmin.id } };
-							}
-							return request;
-						}
-					}
-				}
-			}
-		}
+		medicalRecordResource
 	],
 	branding: {
 		companyName: 'Admin',
