@@ -41,7 +41,13 @@ const Doctor = sequelize.define('Doctor', {
 	underscored: true,
 });
 
+//realtionships
 User.hasOne(Doctor, { foreignKey: 'user_id', onDelete: 'CASCADE' });
 Doctor.belongsTo(User, { foreignKey: 'user_id' });
+
+
+Specialization.hasMany(Doctor, { foreignKey: 'specialization_id', onDelete: 'SET NULL' });
+Doctor.belongsTo(Specialization, { foreignKey: 'specialization_id' });
+
 
 export default Doctor;
