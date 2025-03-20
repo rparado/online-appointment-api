@@ -6,7 +6,7 @@ import { Sequelize } from 'sequelize';
 import bcrypt from 'bcrypt';
 import session from 'express-session';
 import dotenv from 'dotenv';
-import { User, Patient, Doctor, Secretary, Appointment, MedicalRecord, Payment, DoctorAvailability } from '../models/index.js';
+import { User, Secretary, Appointment, MedicalRecord } from '../models/index.js';
 import doctorResource from '../admin/resource/doctorResource.js';
 import specializationResource from '../admin/resource/specializationResource.js';
 import userResource from '../admin/resource/userResource.js';
