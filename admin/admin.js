@@ -13,7 +13,7 @@ import userResource from '../admin/resource/userResource.js';
 import appointmentResource from '../admin/resource/appointmentResource.js';
 import medicalRecordResource from '../admin/resource/medicalRecordsResource.js';
 import patientResource from '../admin/resource/patientResource.js';
-
+import secretaryResource from '../admin/resource/secretaryResource.js';
 
 dotenv.config();
 
@@ -41,23 +41,7 @@ const adminJsOptions = {
 		patientResource,
 		doctorResource,
 		specializationResource,
-		{
-			resource: Secretary,
-			options: {
-				navigation: { name: 'Secretaries', icon: 'Assistant' },
-				actions: {
-					list: {
-						isAccessible: ({ currentAdmin }) => (currentAdmin?.role === 'doctor' || currentAdmin.role === 'admin'),
-						before: async (request, { currentAdmin }) => {
-							if (currentAdmin?.role === 'doctor') {
-								request.query = { ...request.query, where: { doctor_id: currentAdmin.id } };
-							}
-							return request;
-						}
-					}
-				}
-			}
-		},
+		secretaryResource,
 		appointmentResource,
 		{
 			resource: DoctorAvailability,
