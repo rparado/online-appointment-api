@@ -1,5 +1,4 @@
 import Specialization from '../../models/Specialization.js';
-import Doctor from '../../models/Doctor.js';
 
 const specializationResource = {
 	resource: Specialization,

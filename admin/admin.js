@@ -9,6 +9,7 @@ import dotenv from 'dotenv';
 import { User, Patient, Doctor, Secretary, Appointment, MedicalRecord, Payment, DoctorAvailability } from '../models/index.js';
 import doctorResource from '../admin/resource/doctorResource.js';
 import specializationResource from '../admin/resource/specializationResource.js';
+import userResource from '../admin/resource/userResource.js';
 
 dotenv.config();
 
@@ -32,18 +33,7 @@ const adminJsOptions = {
 	databases: [sequelize],
 	rootPath: '/admin',
 	resources: [
-		{
-			resource: User,
-			options: {
-				navigation: { name: 'Users', icon: 'User' },
-				actions: {
-					list: { isAccessible: ({ currentAdmin }) => currentAdmin?.role === 'admin' },
-					edit: { isAccessible: ({ currentAdmin }) => currentAdmin?.role === 'admin' },
-					delete: { isAccessible: ({ currentAdmin }) => currentAdmin?.role === 'admin' },
-					new: { isAccessible: ({ currentAdmin }) => currentAdmin?.role === 'admin' },
-				}
-			}
-		},
+		userResource,
 		{
 			resource: Patient,
 			options: {
